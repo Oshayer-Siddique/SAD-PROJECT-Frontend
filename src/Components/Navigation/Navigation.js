@@ -120,6 +120,7 @@ gap: 2rem;
         height: 100%;
         background: #222260;
         border-radius: 0 10px 10px 0;
+        
     }
 }
 

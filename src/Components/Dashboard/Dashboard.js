@@ -6,9 +6,7 @@ function Dashboard() {
     <DashboardStyled>
 
         <InnerLayout>
-            <h2>
-                Hello Ji
-            </h2>
+            Dashboard
         </InnerLayout>
     </DashboardStyled>
   )

@@ -10,12 +10,15 @@ import React,  { useMemo, useState } from "react";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import Incomes from "./Components/Incomes/Incomes";
 import Expenses from "./Components/Expenses/Expenses";
-
+import { useGlobalContext } from "./Context/globalcontext";
+import Sales from "./Components/Sales/Sales";
 function App() {
 
   const[active,setActive] = React.useState(1)
 
-  const displayData =() =>{
+  const  global = useGlobalContext()
+
+  const displayData = () =>{
     switch(active){
       case 1:
         return <Dashboard/>
@@ -25,6 +28,8 @@ function App() {
          return <Incomes/>
       case 4:
         return <Expenses/>
+      case 5:
+        return <Sales/>
       default : 
       return <Dashboard/>
     }
@@ -47,7 +52,7 @@ function App() {
       <MainLayout>
         <Navigation active={active} setActive={setActive} />
         <main>
-          {displayData}
+          {displayData()}
         </main>
       </MainLayout>
     </Appstyled>
