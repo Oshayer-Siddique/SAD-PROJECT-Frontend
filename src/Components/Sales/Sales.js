@@ -1,6 +1,8 @@
 import React from 'react'
 import  { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
+
 // import { Chart as ChartJS, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { CategoryScale } from 'chart.js';
 import Chart from 'chart.js/auto';
@@ -19,6 +21,7 @@ function Sales() {
     const [topSellingProductsUnits, setTopSellingProductsUnits] = useState([]);
 
     const [revenueByDay, setRevenueByDay] = useState({});
+    const [salesByMonth, setSalesByMonth] = useState({});
 
 
     const [startDate, setStartDate] = useState('');
@@ -29,12 +32,25 @@ function Sales() {
   
     useEffect(() => {
 
+        fetchSalesByMonth();
         fetchTopSellingProducts();
         fetchTopSellingProductsUnits();
         fetchRevenueByDay();
+        
 
       fetchData();
     }, []);
+
+
+const fetchSalesByMonth = async () => {
+    try {
+        const response = await axios.get('http://localhost:5000/sales/sales-by-month');
+        setSalesByMonth(response.data.salesByMonth);
+    } catch (error) {
+        setError('Error fetching sales by month');
+    }
+};
+
 
 
     const fetchRevenueByDay = async () => {
@@ -45,6 +61,50 @@ function Sales() {
             setError('Error fetching revenue by day');
         }
     };
+
+
+
+    const dataM = {
+        labels: Object.keys(salesByMonth),
+        datasets: [
+            {
+                label: 'Sales by Month',
+                data: Object.values(salesByMonth),
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    const optionsM = {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true,
+                title: {
+                    display: true,
+                    text: 'Sales',
+                },
+            },
+            x: {
+                title: {
+                    display: true,
+                    text: 'Month',
+                },
+            },
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Monthly Sales',
+            },
+        },
+    };
+
 
 
     const data = {
@@ -61,6 +121,9 @@ function Sales() {
         ],
     };
 
+
+
+
     const options = {
         responsive: true,
         scales: {
@@ -72,6 +135,8 @@ function Sales() {
                 },
             },
             y: {
+                // beginAtZero: true, // Start the y-axis from zero
+
                 title: {
                     display: true,
                     text: 'Revenue',
@@ -249,7 +314,22 @@ function Sales() {
             <Line data={data} options={options} />
         </div>
 
+
+        <div className="chart-container-bar">
+            <h2>Sales by Month</h2>
+            {error && (
+                <div>
+                    <p style={{ color: 'red' }}>{error}</p>
+                </div>
+            )}
+            <Bar data={dataM} options={optionsM} />
+        </div>
+
 </div>
+
+
+
+
   )
 }
 

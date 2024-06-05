@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { plus } from "../../Utils/icons";
+import { Pie } from "react-chartjs-2";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { width } from "@fortawesome/free-solid-svg-icons/fa0";
 
 const Incomes = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +18,7 @@ const Incomes = () => {
   });
 
   const [incomes, setIncomes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [message, setMessage] = useState("");
   const [totalIncome, setTotalIncome] = useState(0);
@@ -23,9 +26,16 @@ const Incomes = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [chartData, setChartData] = useState({});
+
+  const [error, setError] = useState(null);
+
+
   useEffect(() => {
+    fetchData();
     fetchIncomeData();
     fetchTotalIncome();
+    
   }, []);
 
   const fetchIncomeData = async () => {
@@ -88,6 +98,20 @@ const Incomes = () => {
     }
   };
 
+
+  const fetchData = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/tracking/total-by-category");
+      setChartData(response.data);
+    } catch (error) {
+      console.error("Error fetching the data", error);
+    }
+  };
+
+
+
+
+  
   // Filtered incomes based on search query
   const filteredIncomes = incomes.filter((income) =>
     income.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -96,6 +120,18 @@ const Incomes = () => {
 
   return (
     <IncomeStyled>
+
+{/* <div className="pie-chart">
+      <h2>Income by Category</h2>
+      <Pie data={data} />
+      <ul>
+        {chartData.map(item => (
+          <li key={item._id}>
+            Category: {item._id}, Total Amount: {item.totalAmount}
+          </li>
+        ))}
+      </ul>
+    </div> */}
       <div className="total-income">
         Total Income: <span>${totalIncome}</span>
       </div>
@@ -166,17 +202,17 @@ const Incomes = () => {
         </div>
         <div className="income-list">
           <h2>Income List</h2>
-        <div className="searchbar">
-        <FontAwesomeIcon icon={faSearch} className="search-icon" />
+          <div className="searchbar">
+            <FontAwesomeIcon icon={faSearch} className="search-icon" />
 
-        <input
-            type="text"
-            placeholder="Search by title"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="search-bar"
-          />
-        </div>
+            <input
+              type="text"
+              placeholder="Search by title"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="search-bar"
+            />
+          </div>
 
           <table>
             <thead>
@@ -194,7 +230,10 @@ const Incomes = () => {
                   <td>{income.amount}</td>
 
                   <td>
-                    <button  className="button" onClick={() => handleViewIncome(income)}>
+                    <button
+                      className="button"
+                      onClick={() => handleViewIncome(income)}
+                    >
                       View
                     </button>
                   </td>
@@ -208,12 +247,29 @@ const Incomes = () => {
       {selectedIncome && (
         <div className="income-details">
           <h3>Income Details</h3>
-          <p><strong>Title:</strong> {selectedIncome.title}</p>
-          <p><strong>Date:</strong> {selectedIncome.date}</p>
-          <p><strong>Amount:</strong> ${selectedIncome.amount}</p>
-          <p><strong>Category:</strong> {selectedIncome.category}</p>
-          <p><strong>Description:</strong> {selectedIncome.description}</p>
-          <button className="button close-button" onClick={() => setSelectedIncome(null)}>Close</button>
+          <p>
+            <strong>Title:</strong> {selectedIncome.title}
+          </p>
+          <p>
+            <strong>Date:</strong> {selectedIncome.date}
+          </p>
+          <p>
+            <strong>Amount:</strong> ${selectedIncome.amount}
+          </p>
+          <p>
+            <strong>Category:</strong> {selectedIncome.category}
+          </p>
+          <p>
+            <strong>Description:</strong> {selectedIncome.description}
+          </p>
+          <button
+            className="button close-button"
+            onClick={() => setSelectedIncome(null)}
+          >
+            Close
+          </button>
+
+
         </div>
       )}
     </IncomeStyled>
@@ -222,81 +278,90 @@ const Incomes = () => {
 
 const IncomeStyled = styled.div`
 
-
-.searchbar {
-  display: flex;
-  align-items: center;
-  margin-bottom: 16px;
-  width:100%;
+.pie-chart {
+  width: 300px; /* Adjust the width of the container */
+  height: 300px; /* Adjust the height of the container */
+  margin: 0 auto; /* Center the container horizontally */
+  border: 0px solid #ccc; /* Add a border for visual clarity */
 }
 
-.searchbar input[type="text"] {
-  flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  outline: none;
+.pie-chart h2 {
+  text-align: center; /* Center the heading */
+  margin-bottom: 10px; /* Add some space below the heading */
 }
 
-.searchbar input[type="text"]::placeholder {
-  color: #aaa;
-}
-
-.searchbar .search-icon {
-  margin-right: 8px;
-  color: #777;
-}
-
-.income-details {
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 16px;
-  margin-top: 16px;
-  width:48%;
-  margin-left:51%;
-}
-
-.income-details h3 {
-  margin-bottom: 8px;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.income-details p {
-  margin: 8px 0;
-  font-size: 16px;
-}
+/* Style the pie chart itself */
 
 
-.button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 14px;
-  margin-right: 8px;
-}
+  .searchbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    width: 100%;
+  }
 
-.button:hover {
-  background-color: #0056b3;
-}
+  .searchbar input[type="text"] {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    outline: none;
+  }
 
-.close-button {
-  background-color: #dc3545;
-}
+  .searchbar input[type="text"]::placeholder {
+    color: #aaa;
+  }
 
-.close-button:hover {
-  background-color: #c82333;
-}
+  .searchbar .search-icon {
+    margin-right: 8px;
+    color: #777;
+  }
 
+  .income-details {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+    width: 48%;
+    margin-left: 51%;
+  }
 
+  .income-details h3 {
+    margin-bottom: 8px;
+    font-size: 18px;
+    font-weight: bold;
+  }
 
+  .income-details p {
+    margin: 8px 0;
+    font-size: 16px;
+  }
 
-  
+  .button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-right: 8px;
+  }
+
+  .button:hover {
+    background-color: #0056b3;
+  }
+
+  .close-button {
+    background-color: #dc3545;
+  }
+
+  .close-button:hover {
+    background-color: #c82333;
+  }
+
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -443,8 +508,6 @@ const IncomeStyled = styled.div`
     width: 1.2rem;
     height: 1.2rem;
   }
-
-
 `;
 
 export default Incomes;
