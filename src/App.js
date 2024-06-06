@@ -12,6 +12,7 @@ import Incomes from "./Components/Incomes/Incomes";
 import Expenses from "./Components/Expenses/Expenses";
 import { useGlobalContext } from "./Context/globalcontext";
 import Sales from "./Components/Sales/Sales";
+import Analyze from "./Components/Analyze/Analyze";
 function App() {
 
   const[active,setActive] = React.useState(1)
@@ -23,7 +24,7 @@ function App() {
       case 1:
         return <Dashboard/>
       case 2:
-        return <Dashboard/>
+        return <Analyze/>
       case 3:
          return <Incomes/>
       case 4:

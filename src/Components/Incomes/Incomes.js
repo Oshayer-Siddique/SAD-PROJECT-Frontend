@@ -28,6 +28,9 @@ const Incomes = () => {
 
   const [chartData, setChartData] = useState({});
 
+  const [totalByCategory, setTotalByCategory] = useState([]);
+
+
   const [error, setError] = useState(null);
 
 
@@ -35,8 +38,19 @@ const Incomes = () => {
     fetchData();
     fetchIncomeData();
     fetchTotalIncome();
+    fetchTotalByCategory();
     
   }, []);
+
+
+  const fetchTotalByCategory = async () => {
+    try {
+        const response = await axios.get('http://localhost:5000/tracking/total-by-category');
+        setTotalByCategory(response.data);
+    } catch (error) {
+        setError('Error fetching total by category');
+    }
+};
 
   const fetchIncomeData = async () => {
     try {
@@ -116,22 +130,61 @@ const Incomes = () => {
   const filteredIncomes = incomes.filter((income) =>
     income.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  console.log("Filtered Incomes:", filteredIncomes); // Debugging log
+  console.log("Filtered Incomes:", filteredIncomes);
+  
+  
+  const data = {
+    labels: totalByCategory.map(category => category._id),
+    datasets: [
+        {
+            label: 'Total Amount by Category',
+            data: totalByCategory.map(category => category.totalAmount),
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+            ],
+            borderWidth: 1,
+        },
+    ],
+};
+
+const options = {
+    responsive: true,
+    plugins: {
+        legend: {
+            position: 'top',
+        },
+        title: {
+            display: true,
+            text: 'Total Amount by Category',
+        },
+    },
+};// Debugging log
 
   return (
     <IncomeStyled>
 
-{/* <div className="pie-chart">
-      <h2>Income by Category</h2>
-      <Pie data={data} />
-      <ul>
-        {chartData.map(item => (
-          <li key={item._id}>
-            Category: {item._id}, Total Amount: {item.totalAmount}
-          </li>
-        ))}
-      </ul>
-    </div> */}
+    <div className="chart-container">
+            <h2>Income by Category</h2>
+            {error && (
+                <div className="error-message">
+                    <p>{error}</p>
+                </div>
+            )}
+            <Pie data={data} options={options} />
+        </div>
       <div className="total-income">
         Total Income: <span>${totalIncome}</span>
       </div>
@@ -324,8 +377,8 @@ const IncomeStyled = styled.div`
     border-radius: 8px;
     padding: 16px;
     margin-top: 16px;
-    width: 48%;
-    margin-left: 51%;
+    width: 50%;
+    margin-left: 25%;
   }
 
   .income-details h3 {
@@ -381,6 +434,7 @@ const IncomeStyled = styled.div`
     gap: 0.5rem;
     width: 70%;
     margin-left: 15%;
+    mrgin-top: 30%;
   }
 
   .total-income span {

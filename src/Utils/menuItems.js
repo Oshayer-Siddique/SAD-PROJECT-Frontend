@@ -9,13 +9,13 @@ export const menuItems = [
     {
         id: 1,
         title : 'Dashboard',
-        icon: dashboard,
+        icon: transactions,
         link: '/dashboard',
     },
     {
         id: 2,
-        title: "View Transactions",
-        icon: transactions,
+        title: "Analyze",
+        icon: dashboard,
         link: "/dashboard",
     },
     {

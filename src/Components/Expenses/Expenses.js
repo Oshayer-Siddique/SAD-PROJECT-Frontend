@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styled from "styled-components";
 import { plus } from "../../Utils/icons";
-
+import { Pie } from "react-chartjs-2";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
@@ -20,13 +20,26 @@ const Expenses = () => {
   const [message, setMessage] = useState("");
   const [totalIncome, setTotalIncome] = useState(0);
   const [selectedIncome, setSelectedIncome] = useState(null);
+  const [totalByCategory, setTotalByCategory] = useState([]);
+  const [error, setError] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchIncomeData();
     fetchTotalIncome();
+    fetchTotalByCategory();
   }, []);
+
+
+  const fetchTotalByCategory = async () => {
+    try {
+        const response = await axios.get('http://localhost:5000/tracking/total-expense-by-category');
+        setTotalByCategory(response.data);
+    } catch (error) {
+        setError('Error fetching total by category');
+    }
+};
 
   const fetchIncomeData = async () => {
     try {
@@ -94,8 +107,59 @@ const Expenses = () => {
   );
   console.log("Filtered Expenses:", filteredExpenses); // Debugging log
 
+  const data = {
+    labels: totalByCategory.map(category => category._id),
+    datasets: [
+        {
+            label: 'Total Amount by Category',
+            data: totalByCategory.map(category => category.totalAmount),
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.6)',
+                'rgba(54, 162, 235, 0.6)',
+                'rgba(255, 206, 86, 0.6)',
+                'rgba(75, 192, 192, 0.6)',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(255, 159, 64, 0.6)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+            ],
+            borderWidth: 1,
+        },
+    ],
+};
+
+const options = {
+    responsive: true,
+    plugins: {
+        legend: {
+            position: 'top',
+        },
+        title: {
+            display: true,
+            text: 'Total Amount by Category',
+        },
+    },
+};// 
+
+
   return (
     <Expensestyled>
+
+      <div className="chart-container">
+            <h2>Income by Category</h2>
+            {error && (
+                <div className="error-message">
+                    <p>{error}</p>
+                </div>
+            )}
+            <Pie data={data} options={options} />
+        </div>
       <div className="total-income">
         Total Income: <span>${totalIncome}</span>
       </div>
