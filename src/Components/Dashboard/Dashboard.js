@@ -1,91 +1,148 @@
-import React from 'react'
-import styled from 'styled-components'
-import { InnerLayout } from '../../Styles/Layout';
-function Dashboard() {
-  return (
-    <DashboardStyled>
+// Components.js
 
-        <InnerLayout>
-            Dashboard
-        </InnerLayout>
-    </DashboardStyled>
-  )
-}
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./Dashboard.css";
 
+const Dashboard = () => {
+  const [revenue, setRevenue] = useState(null);
+  const [grossMargin, setGrossMargin] = useState(null);
+  const [netIncome, setNetIncome] = useState(null);
+  const [taxPercent, setTaxPercent] = useState("");
+  const [depreciation, setDepreciation] = useState("");
+  const [amortization, setAmortization] = useState("");
+  const [error, setError] = useState("");
 
-const DashboardStyled = styled.div`
-    .stats-con{
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 2rem;
-        .chart-con{
-            grid-column: 1 / 4;
-            height: 400px;
-            .amount-con{
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 2rem;
-                margin-top: 2rem;
-                .income, .expense{
-                    grid-column: span 2;
-                }
-                .income, .expense, .balance{
-                    background: #FCF6F9;
-                    border: 2px solid #FFFFFF;
-                    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-                    border-radius: 20px;
-                    padding: 1rem;
-                    p{
-                        font-size: 3.5rem;
-                        font-weight: 700;
-                    }
-                }
+  const [file, setFile] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState(null);
 
-                .balance{
-                    grid-column: 2 / 4;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    p{
-                        color: var(--color-green);
-                        opacity: 0.6;
-                        font-size: 4.5rem;
-                    }
-                }
-            }
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const revenueResponse = await axios.get(
+          "http://localhost:5000/finance/revenue"
+        );
+        setRevenue(revenueResponse.data.Money);
+
+        const grossMarginResponse = await axios.get(
+          "http://localhost:5000/finance/gross-margin"
+        );
+        setGrossMargin(grossMarginResponse.data.Gross_Margin);
+      } catch (error) {
+        setError("Error fetching data");
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/finance/net-income",
+        {
+          tax_percent: taxPercent,
+          depreciation,
+          amortization,
         }
-
-        .history-con{
-            grid-column: 4 / -1;
-            h2{
-                margin: 1rem 0;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-            .salary-title{
-                font-size: 1.2rem;
-                span{
-                    font-size: 1.8rem;
-                }
-            }
-            .salary-item{
-                background: #FCF6F9;
-                border: 2px solid #FFFFFF;
-                box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.06);
-                padding: 1rem;
-                border-radius: 20px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                p{
-                    font-weight: 600;
-                    font-size: 1.6rem;
-                }
-            }
-        }
+      );
+      setNetIncome(response.data.Net_Income);
+      console.log(response.data);
+    } catch (error) {
+      setError("Error calculating net income");
     }
-`;
+  };
 
-export default Dashboard
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await axios.post("http://localhost:5000/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setUploadStatus(response.data.message);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      setUploadStatus("Error uploading file");
+    }
+  };
+
+  return (
+    <div className="dashboard-container">
+
+
+<div className="form-container">
+    <h2>
+      File Upload <i className="fas fa-upload"></i>
+    </h2>
+    <input type="file" onChange={handleFileChange} />
+            <button onClick={handleUpload}>Upload</button>
+            {uploadStatus && <p>{uploadStatus}</p>}
+  </div>
+      <div className="data-container">
+        <h2>
+          Revenue <i className="fas fa-dollar-sign"></i>
+        </h2>
+        <p>{revenue}</p>
+      </div>
+
+
+      <div className="data-container">
+        <h2>
+          Gross Margin <i className="fas fa-chart-line"></i>
+        </h2>
+        <p>{grossMargin}%</p>
+      </div>
+      <div className="form-container">
+        <h2>
+          Net Income <i className="fas fa-file-invoice-dollar"></i>
+        </h2>{" "}
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Tax Percentage:</label>
+            <input
+              type="text"
+              value={taxPercent}
+              onChange={(e) => setTaxPercent(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Depreciation:</label>
+            <input
+              type="text"
+              value={depreciation}
+              onChange={(e) => setDepreciation(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label>Amortization:</label>
+            <input
+              type="text"
+              value={amortization}
+              onChange={(e) => setAmortization(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit">Calculate Net Income</button>
+        </form>
+        {netIncome !== null && <p>Net Income: {netIncome}</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
+      </div>
+
+
+    </div>
+  );
+};
+
+export default Dashboard;

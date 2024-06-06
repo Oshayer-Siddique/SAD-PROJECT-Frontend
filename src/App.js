@@ -2,6 +2,8 @@ import logo from "./logo.svg";
 import "./App.css";
 import { GlobalStyle } from "./Styles/GlobalStyle";
 import styled from "styled-components";
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+
 import bg from './img/bg.png';
 import { MainLayout } from "./Styles/Layout";
 import Orb from "./Components/Orb/Orb";
@@ -13,7 +15,11 @@ import Expenses from "./Components/Expenses/Expenses";
 import { useGlobalContext } from "./Context/globalcontext";
 import Sales from "./Components/Sales/Sales";
 import Analyze from "./Components/Analyze/Analyze";
+import Registration from '../src/Components/Registration'
+
+
 function App() {
+  
 
   const[active,setActive] = React.useState(1)
 
@@ -46,17 +52,27 @@ function App() {
   },[])
 
   return (
-    <Appstyled bg = {bg} className="App">
 
+    <BrowserRouter>
+    
+    <Appstyled bg = {bg} className="App">
+    
       <GlobalStyle></GlobalStyle>
         {orbMemo}
       <MainLayout>
         <Navigation active={active} setActive={setActive} />
         <main>
-          {displayData()}
+        {displayData()}
+
+
         </main>
       </MainLayout>
+      
     </Appstyled>
+
+    
+
+    </BrowserRouter>
   );
 }
 
