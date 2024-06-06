@@ -63,8 +63,50 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/a
 
 ### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
 
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+
+# Project Overview
+NEW FINANCE is a comprehensive business analysis web application designed to help users manage and forecast their financial data efficiently. With features for uploading and manually inputting data, the app provides robust analysis using the ARIMA model and offers a user-friendly interface for navigating different financial operations.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+
+## Usage
+
+### Dashboard
+**Overview:** Displays total revenue, rate, and other financial metrics.
+**Navigation:** Use the left-side panel to navigate to different sections of the app.
+
+### Analyze
+**Upload Spreadsheet:** Click on the 'Upload' button to upload a spreadsheet file with financial data.
+**Forecasting:** Forecast of 30 days from present by analyzing the data through ARIMA
+
+### Forecasting
+**Analysis:** Navigate to the 'Forecasting' section to view the ARIMA model analysis and forecasted data.
+**Visualization:** The forecasted data is presented in an easy-to-understand graph format.
+
+### Expense Management
+**Record Expenses:** Navigate to the 'Expenses' section to record new expenses.
+**View History:** Historical expenses are displayed for reference and analysis.
+
+### Income Management
+**Record Income:** Navigate to the 'Income' section to record new income entries.
+**View History:** Historical income entries are displayed for reference and analysis.
+
+### API Endpoints
+Forecasting Endpoint
+
+## Dependencies
+**Node.js:** JavaScript runtime environment.
+**Express.js:** Web framework for Node.js.
+**React.js:** Frontend library for building user interfaces.
+**Axios:** Promise-based HTTP client for the browser and Node.js.
+**pandas:** Data analysis and manipulation library for Python.
+**statsmodels:** Statistical modeling library for Python.
+**ARIMA:** Time series forecasting model.
+
